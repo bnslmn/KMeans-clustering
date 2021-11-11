@@ -1,11 +1,8 @@
 package algorithms;
 
 import java.awt.Point;
-import java.security.spec.ECField;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 public class DefaultTeam {
     private final Random rd = new Random();
@@ -16,26 +13,14 @@ public class DefaultTeam {
         Point[] means = new Point[5];
 
         ArrayList<ArrayList<Point>> kMeans = new ArrayList<>();
-        kMeans.add(0, new ArrayList<Point>());
-        kMeans.add(1, new ArrayList<Point>());
-        kMeans.add(2, new ArrayList<Point>());
-        kMeans.add(3, new ArrayList<Point>());
-        kMeans.add(4, new ArrayList<Point>());
+
+        for (int j = 0; j < 5; j++)
+            kMeans.add(j, new ArrayList<>());
+
         int i = 0;
-        boolean trouve = false;
         while (i <= 4) {
-            Point mean = new Point((int) rd.nextInt(points.size()), (int) rd.nextInt(points.size()));
-            for(int j = 0 ; j <=4; j++){
-                if(means[j] == null) continue;
-                if ( mean.x == means[j].x && mean.y == means[j].y){
-                    trouve = true;
-                    break;
-                }
-            }
-            if(!trouve){
-                means[i] = mean;
-                i++;
-            }
+            means[i] = new Point(rd.nextInt(points.size()), rd.nextInt(points.size()));
+            i++;
         }
 
         // means = [Point1 , Point2 , Point3, Point4, Point5]
@@ -55,7 +40,7 @@ public class DefaultTeam {
         }
 
         boolean swap = true;
-        while(swap){
+        while (swap) {
             swap = adjustCluster(means, kMeans);
         }
         return kMeans;
@@ -64,31 +49,32 @@ public class DefaultTeam {
     private boolean adjustCluster(Point[] means, ArrayList<ArrayList<Point>> kMeans) {
         int i;
         double distMin;
-        for (i = 0; i < 5; i++){
-            if(kMeans.get(i).size() == 0) continue;
+        for (i = 0; i < 5; i++) {
+            if (kMeans.get(i).size() == 0) continue;
             means[i] = barycentre(kMeans.get(i));
         }
 
         //kMeans = [p1p2p3...p_n ;     p1p2p3...p_m  ;  ....   ;   p1p2...p_k]
-        boolean swap = false;
+        boolean bascule = false;
         for (i = 0; i <= 4; i++) {
-            for (int k = 0 ; k < kMeans.get(i).size() ; k++) {
-                Point p = kMeans.get(i).get(k);
-                distMin = p.distance(means[i]);
+            for (int k = 0; k < kMeans.get(i).size(); k++) {
+                Point p = kMeans.get(i).get(k); // points du cluster actuel
+                distMin = p.distance(means[i]);// distance entre le point et son mean actuel
                 for (int j = 0; j <= 4; j++) {
                     if (i == j) continue;
-                    if (p.distance(means[j]) < distMin) {
-                        //swap
-                        swap = true;
-                        distMin = p.distance(means[i]);
-                        if(kMeans.get(i).remove(p))
-                             kMeans.get(j).add(p);
+                    if (p.distance(means[j]) < distMin) { // si il existe un autre mean plus proche ==> basculer mean
+                        distMin = p.distance(means[j]);
+                        if (kMeans.get(i).remove(p)) {
+                            if (kMeans.get(j).add(p))
+                                bascule = true;
+                        }
                     }
                 }
             }
         }
-        return swap;
+        return bascule;
     }
+
     public Point barycentre(ArrayList<Point> points) {
         double x = 0;
         double y = 0;
@@ -96,6 +82,6 @@ public class DefaultTeam {
             x = x + point.getX();
             y = y + point.getY();
         }
-        return new Point((int)x / points.size(), (int)y / points.size());
+        return new Point((int) x / points.size(), (int) y / points.size());
     }
 }
