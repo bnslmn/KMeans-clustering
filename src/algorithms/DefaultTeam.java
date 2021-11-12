@@ -70,15 +70,17 @@ public class DefaultTeam {
         }
 
         boolean flip = false;
+        ArrayList<Point> cluster;
         for (i = 0; i <= 4; i++) {
-            for (int k = 0; k < kMeans.get(i).size(); k++) {
-                Point p = kMeans.get(i).get(k); // set of points of the actual cluster
+            cluster = kMeans.get(i);
+            for (int k = 0; k < cluster.size(); k++) {
+                Point p = cluster.get(k); // set of points of the actual cluster
                 distMin = p.distance(means[i]);// it's suffiscient to initialize using the current mean distancefrom the point
                 for (int j = 0; j <= 4; j++) {
                     if (i == j) continue;
                     if (p.distance(means[j]) < distMin) { // a new mean is closer, must flip the point to the appropriate cluster !
                         distMin = p.distance(means[j]);
-                        if (kMeans.get(i).remove(p)) {
+                        if (cluster.remove(p)) {
                             if (kMeans.get(j).add(p))
                                 flip = true;
                         }
