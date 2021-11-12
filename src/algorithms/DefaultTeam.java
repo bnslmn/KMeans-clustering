@@ -29,9 +29,8 @@ public class DefaultTeam {
             means[j] = new Point(rd.nextInt(points.size()), rd.nextInt(points.size()));
         }
         // now, let's divide the points into the K clusters (choose the closest cluster's mean point)
-        double shortDist;
         for (int p=0 ; p<points.size()/2 ; p++) {
-
+            // lets do 2 in 1 for optimizing the algorithm
             Point p1 = points.get(p);
             Point p2 = points.get(points.size()-1-p);
 
