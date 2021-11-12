@@ -8,6 +8,7 @@ import java.util.Random;
 public class DefaultTeam {
     private final Random rd = new Random();
 
+    private final static int K = 9;
 
     /**
      * KNN Algorithm (K-Means) for k = 5
@@ -15,18 +16,18 @@ public class DefaultTeam {
      * Compute 5 sets of points with the classical k-means algorithm
      *
      *  @param points  : Set of points
-     *  @return  5 sets of points (clusters)
+     *  @return  K sets of points (clusters)
      * */
     public ArrayList<ArrayList<Point>> calculKMeans(ArrayList<Point> points) {
 
-        Point[] means = new Point[5];  // K = 5 clusters
+        Point[] means = new Point[K];  // K cluster's means
         ArrayList<ArrayList<Point>> kMeans = new ArrayList<>(); // the data structure containing all the clusters
 
-        for (int j = 0; j < 5; j++) {
+        for (int j = 0; j < K; j++) {
             kMeans.add(j, new ArrayList<>());
             means[j] = new Point(rd.nextInt(points.size()), rd.nextInt(points.size()));
         }
-        // now, let's divide the points into the 5 clusters (choose the closest cluster's mean point)
+        // now, let's divide the points into the K clusters (choose the closest cluster's mean point)
         double shortDist;
         for (int p=0 ; p<points.size()/2 ; p++) {
 
@@ -37,7 +38,7 @@ public class DefaultTeam {
             int toAdd2 = 0;
             double shortDist1 = Double.MAX_VALUE;
             double shortDist2 = Double.MAX_VALUE;
-            for (int i = 0; i <= 4; i++) {
+            for (int i = 0; i < K; i++) {
                 if (p1.distance(means[i]) < shortDist1) {
                     shortDist1 = p1.distance(means[i]);
                     toAdd1 = i;
@@ -76,18 +77,18 @@ public class DefaultTeam {
         int i;
         double distMin;
         ArrayList<Point> cluster;
-        for (i = 0; i < 5; i++) {
+        for (i = 0; i < K; i++) {
             cluster = kMeans.get(i);
             if (cluster.size() == 0) continue;
             means[i] = barycentre(cluster);
         }
         boolean flip = false;
-        for (i = 0; i <= 4; i++) {
+        for (i = 0; i < K; i++) {
             cluster = kMeans.get(i);
             for (int k = 0; k < cluster.size(); k++) {
                 Point p = cluster.get(k); // set of points of the actual cluster
                 distMin = p.distance(means[i]);// it's suffiscient to initialize using the current mean distancefrom the point
-                for (int j = 0; j <= 4; j++) {
+                for (int j = 0; j < K; j++) {
                     if (i == j) continue;
                     if (p.distance(means[j]) < distMin) { // a new mean is closer, must flip the point to the appropriate cluster !
                         distMin = p.distance(means[j]);
