@@ -26,8 +26,11 @@ public class DefaultTeam {
 
         for (int j = 0; j < K; j++) {
             kMeans.add(j, new ArrayList<>());
-            means[j] = new Point(rd.nextInt(points.size()), rd.nextInt(points.size()));
         }
+
+        // KNN ++ Initialization of the mean points
+        initializeKnnMeans(points, means);
+
         // now, let's divide the points into the K clusters (choose the closest cluster's mean point)
         for (int p=0 ; p<points.size()/2 ; p++) {
             // lets do 2 in 1 for optimizing the algorithm
@@ -57,6 +60,33 @@ public class DefaultTeam {
             adjustCluster(means, kMeans) ;
         }
         return kMeans;
+    }
+
+    /**
+     * KNN ++ Initialization Algorithm
+     *
+     * Choose a random mean point & for the k-1 others, pick the nearest point of one of the already picked mean points
+     *
+     * @param points : dataSet of points
+     * @param means  : the array of means to initialize
+     * */
+    private void initializeKnnMeans(ArrayList<Point> points, Point[] means) {
+        means[0] = points.get(rd.nextInt(points.size()));
+        int nbMeans = 1;
+        int chosenMean = -1;
+        while(nbMeans < K){
+            Point meanRef = new Point(means[rd.nextInt(nbMeans)]);
+            double distance = Double.MAX_VALUE;
+            for(int i = 0; i < points.size() ; i++){
+                Point p = points.get(i);
+                if(meanRef.distance(p) < distance){
+                    distance = meanRef.distance(p);
+                    chosenMean = i;
+                }
+            }
+            means[nbMeans] = points.get(chosenMean);
+            nbMeans++;
+        }
     }
 
 
