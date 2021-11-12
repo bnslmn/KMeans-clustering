@@ -71,17 +71,25 @@ public class DefaultTeam {
      * @param means  : the array of means to initialize
      * */
     private void initializeKnnMeans(ArrayList<Point> points, Point[] means) {
-        means[0] = points.get(rd.nextInt(points.size()));
+        final int SIZE = points.size();
+        means[0] = points.get(rd.nextInt(SIZE));
         int nbMeans = 1;
         int chosenMean = -1;
         while(nbMeans < K){
             Point meanRef = new Point(means[rd.nextInt(nbMeans)]);
             double distance = Double.MAX_VALUE;
-            for(int i = 0; i < points.size() ; i++){
-                Point p = points.get(i);
-                if(meanRef.distance(p) < distance){
-                    distance = meanRef.distance(p);
+            for(int i = 0; i < SIZE/2 ; i++){
+                // 2 in 1 to do SIZE/2 instead of SIZE iterations
+                Point p1 = points.get(i);
+                Point p2 = points.get(SIZE-1-i);
+
+                if(meanRef.distance(p1) < distance){
+                    distance = meanRef.distance(p1);
                     chosenMean = i;
+                }
+                if(meanRef.distance(p2) < distance){
+                    distance = meanRef.distance(p2);
+                    chosenMean = SIZE-1-i;
                 }
             }
             means[nbMeans] = points.get(chosenMean);
