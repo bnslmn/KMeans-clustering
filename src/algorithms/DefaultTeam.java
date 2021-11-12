@@ -4,48 +4,63 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 
+
 public class DefaultTeam {
     private final Random rd = new Random();
 
+
+    /**
+     * KNN Algorithm (K-Means) for k = 5
+     *
+     * Compute 5 sets of points with the classical k-means algorithm
+     *
+     *  @param points  : Set of points
+     *  @return  5 sets of points (clusters)
+     * */
     public ArrayList<ArrayList<Point>> calculKMeans(ArrayList<Point> points) {
 
-        // Initialization
-        Point[] means = new Point[5];
+        Point[] means = new Point[5];  // K = 5 clusters
+        ArrayList<ArrayList<Point>> kMeans = new ArrayList<>(); // the data structure containing all the clusters
 
-        ArrayList<ArrayList<Point>> kMeans = new ArrayList<>();
-
-        for (int j = 0; j < 5; j++)
+        for (int j = 0; j < 5; j++) {
             kMeans.add(j, new ArrayList<>());
-
-        int i = 0;
-        while (i <= 4) {
-            means[i] = new Point(rd.nextInt(points.size()), rd.nextInt(points.size()));
-            i++;
+            means[j] = new Point(rd.nextInt(points.size()), rd.nextInt(points.size()));
         }
-
-        // means = [Point1 , Point2 , Point3, Point4, Point5]
-
-        // Maintenant, partageons les points en cinq selon le mean le plus proche
-        double distMin;
+        // now, let's divide the points into the 5 clusters (choose the closest cluster's mean point)
+        double shortDist;
         for (Point p : points) {
-            distMin = Double.MAX_VALUE;
+            shortDist = Double.MAX_VALUE;
             int toAdd = 0;
-            for (i = 0; i <= 4; i++) {
-                if (p.distance(means[i]) < distMin) {
-                    distMin = p.distance(means[i]);
+            for (int i = 0; i <= 4; i++) {
+                if (p.distance(means[i]) < shortDist) {
+                    shortDist = p.distance(means[i]);
                     toAdd = i;
                 }
             }
             kMeans.get(toAdd).add(p);
         }
 
-        boolean swap = true;
-        while (swap) {
-            swap = adjustCluster(means, kMeans);
+        // repeat the process until there's no changes comparing to a previous iteration
+        while (adjustCluster(means, kMeans)) { // called at least one time
+            adjustCluster(means, kMeans) ;
         }
         return kMeans;
     }
 
+
+    /**
+     * @param means :   Array of actual mean points
+     * @param kMeans :  ArrayList of 5 Clusters
+     *
+     * Analyse the clusters by :
+     *   - adjusting its means by computing the barycenter of each set of points in a cluster
+     *   - compute new distances from the new mean for each points and flip them into the appropriate cluster
+     *
+     * The algorithm ends when no changes were done in the previous iteration
+     *
+     * @return True if changes in the cluster were done, if else it returns False.
+     *
+     * */
     private boolean adjustCluster(Point[] means, ArrayList<ArrayList<Point>> kMeans) {
         int i;
         double distMin;
@@ -54,27 +69,35 @@ public class DefaultTeam {
             means[i] = barycentre(kMeans.get(i));
         }
 
-        //kMeans = [p1p2p3...p_n ;     p1p2p3...p_m  ;  ....   ;   p1p2...p_k]
-        boolean bascule = false;
+        boolean flip = false;
         for (i = 0; i <= 4; i++) {
             for (int k = 0; k < kMeans.get(i).size(); k++) {
-                Point p = kMeans.get(i).get(k); // points du cluster actuel
-                distMin = p.distance(means[i]);// distance entre le point et son mean actuel
+                Point p = kMeans.get(i).get(k); // set of points of the actual cluster
+                distMin = p.distance(means[i]);// it's suffiscient to initialize using the current mean distancefrom the point
                 for (int j = 0; j <= 4; j++) {
                     if (i == j) continue;
-                    if (p.distance(means[j]) < distMin) { // si il existe un autre mean plus proche ==> basculer mean
+                    if (p.distance(means[j]) < distMin) { // a new mean is closer, must flip the point to the appropriate cluster !
                         distMin = p.distance(means[j]);
                         if (kMeans.get(i).remove(p)) {
                             if (kMeans.get(j).add(p))
-                                bascule = true;
+                                flip = true;
                         }
                     }
                 }
             }
         }
-        return bascule;
+        return flip;
     }
 
+    /***
+     * Compute the barycenter of a set of points
+     *
+     * Used in this context to search for mean points
+     *
+     * @param points : set of points
+     * @return the barycenter of the set
+     *
+     */
     public Point barycentre(ArrayList<Point> points) {
         double x = 0;
         double y = 0;
