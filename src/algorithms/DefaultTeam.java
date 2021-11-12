@@ -28,16 +28,27 @@ public class DefaultTeam {
         }
         // now, let's divide the points into the 5 clusters (choose the closest cluster's mean point)
         double shortDist;
-        for (Point p : points) {
-            shortDist = Double.MAX_VALUE;
-            int toAdd = 0;
+        for (int p=0 ; p<points.size()/2 ; p++) {
+
+            Point p1 = points.get(p);
+            Point p2 = points.get(points.size()-1-p);
+
+            int toAdd1 = 0;
+            int toAdd2 = 0;
+            double shortDist1 = Double.MAX_VALUE;
+            double shortDist2 = Double.MAX_VALUE;
             for (int i = 0; i <= 4; i++) {
-                if (p.distance(means[i]) < shortDist) {
-                    shortDist = p.distance(means[i]);
-                    toAdd = i;
+                if (p1.distance(means[i]) < shortDist1) {
+                    shortDist1 = p1.distance(means[i]);
+                    toAdd1 = i;
+                }
+                if (p2.distance(means[i]) < shortDist2) {
+                    shortDist1 = p2.distance(means[i]);
+                    toAdd2= i;
                 }
             }
-            kMeans.get(toAdd).add(p);
+            kMeans.get(toAdd1).add(p1);
+            kMeans.get(toAdd2).add(p2);
         }
 
         // repeat the process until there's no changes comparing to a previous iteration
@@ -54,7 +65,7 @@ public class DefaultTeam {
      *
      * Analyse the clusters by :
      *   - adjusting its means by computing the barycenter of each set of points in a cluster
-     *   - compute new distances from the new mean for each points and flip them into the appropriate cluster
+     *   - update clusters with new means for each point and flip them into the appropriate cluster if necessary
      *
      * The algorithm ends when no changes were done in the previous iteration
      *
@@ -64,13 +75,13 @@ public class DefaultTeam {
     private boolean adjustCluster(Point[] means, ArrayList<ArrayList<Point>> kMeans) {
         int i;
         double distMin;
-        for (i = 0; i < 5; i++) {
-            if (kMeans.get(i).size() == 0) continue;
-            means[i] = barycentre(kMeans.get(i));
-        }
-
-        boolean flip = false;
         ArrayList<Point> cluster;
+        for (i = 0; i < 5; i++) {
+            cluster = kMeans.get(i);
+            if (cluster.size() == 0) continue;
+            means[i] = barycentre(cluster);
+        }
+        boolean flip = false;
         for (i = 0; i <= 4; i++) {
             cluster = kMeans.get(i);
             for (int k = 0; k < cluster.size(); k++) {
