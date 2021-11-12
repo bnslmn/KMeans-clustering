@@ -8,7 +8,8 @@ import java.util.Random;
 public class DefaultTeam {
     private final Random rd = new Random();
 
-    private final static int K = 9;
+    // choose the k - number of clusters
+    private final static int K = 5;
 
     /**
      * KNN Algorithm (K-Means) for k = 5
