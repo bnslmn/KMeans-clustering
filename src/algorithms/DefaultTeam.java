@@ -120,9 +120,10 @@ public class DefaultTeam {
      *               The algorithm ends when no changes were done in the previous iteration
      *
      *               The algorithm uses acceleration techniques, especially with sorting the means,
-     *               see :
-     *               Steven J. Philips, Acceleration of K-Means and Related Clustering Algorithms,
-     *                       AT&T Labs-Research, DOI : 10.1007/3-540-45643-0_13
+     *               see the article:
+     *
+     *               	Steven J. Phillips:
+     *                  Acceleration of K-Means and Related Clustering Algorithms. ALENEX 2002: 166-177
      *
      * @return True if changes in the cluster were done, if else it returns False.
      */
@@ -148,7 +149,7 @@ public class DefaultTeam {
                 double inClassDist = p.distance(means[i]);
                 distMin = inClassDist;  // it's sufficient to initialize using the current mean distance from the point
                 int minClass = i;
-                for (int j = 0; j < K; j++) {
+                for (int j = 1; j < K; j++) {
                     int theClass = m[i][j];
                     if (d[i][theClass] >= 2 * inClassDist)
                         break;   // link to article
