@@ -30,7 +30,7 @@ We obtain :
 
 And after a (very harsh) benchmark of tests :
 
-![kMeans_afterall](https://user-images.githubusercontent.com/77028316/141666334-60829357-f019-42df-a664-0fe3b5dc0558.png)
+![122142_55111ms](https://user-images.githubusercontent.com/77028316/144241275-61bfa2c8-6ea0-4962-9871-2620adb49a66.png)
 
 
 
